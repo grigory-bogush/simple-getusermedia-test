@@ -1,25 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useRef } from 'react';
+import './App.scss';
 
-function App() {
+const cameraParams = {
+  audio: false,
+  video: {
+    width: { ideal: 1920 },
+    height: { ideal: 1080 },
+    advanced: [{ facingMode: 'environment' }]
+  }
+};
+
+const App = () => {
+  const vidRef = useRef(null);
+  useEffect(() => {
+    const vidEl = vidRef.current;
+    if (vidEl && navigator.mediaDevices) {
+      navigator.mediaDevices.getUserMedia(cameraParams).then(stream => {
+          vidEl.setAttribute('autoplay', '');
+          vidEl.setAttribute('muted', '');
+          vidEl.setAttribute('playsinline', '');
+          vidEl.srcObject = stream;
+          vidEl.play();
+      }).catch(err => alert(err.message));
+    } else {
+      alert('cant access camera');
+    }
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <>
+    <h3 className='main--title'>iOS getUserMedia test</h3>
+    <div className='main--cnt'>
+      <video ref={vidRef} className='main--video'/>
     </div>
+    </>
   );
 }
 
